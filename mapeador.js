@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const port = 3334;
+const port = 22;
 
 const isValidURL = (url) => {
   const regex = /^https?:\/\/\w+(\.\w+)*\/([\w-]+\/)+$/;
