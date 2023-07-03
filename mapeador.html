@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Solicitação de URL</title>
+</head>
+<body>
+    <style>
+        .input-wrapper input[type="file"] {
+          width: 500px;
+        }
+    
+        @font-face {
+          font-family: 'Kanit-Bold';
+          src: url('assets/fonts/Kanit-Bold.ttf') format('truetype');
+          /* Outros formatos de arquivo de fonte também podem ser adicionados aqui */
+        }
+    
+        body {
+          font-family: 'Kanit-Bold', sans-serif;
+          font-size: 16px;
+          background-image: url('https://a2bi.com.br/photos/A%C2%B2Business-intelligence-home.jpg');
+          background-repeat: no-repeat;
+          background-size: cover;
+          padding-left: 50px;
+        }
+    
+        form {
+          gap: 10px;
+        }
+    
+        label {
+          display: block;
+        }
+    
+        input[type="file"] {
+          width: 300px;
+          padding: 5px;
+        }
+    
+        button {
+          padding: 10px 20px;
+          background: rgb(161 22 22);
+          font-family: roboto;
+          font-size: 16px;
+          color: #ffff;
+          cursor: pointer;
+          border-color: #ffffff00;
+        }
+    
+        button:hover {
+          background: rgb(201, 14, 14);
+          transition: ease 0.3s;
+          font-size: 18px;
+        }
+
+        #urlInput{
+            font-size: 15px;
+            padding: 10px;
+        }
+
+        h1 {
+          font-family: 'Kanit-Bold', sans-serif;
+          color: #ffff;
+          font-size: 70px;
+          font-weight: bold;
+          font-weight: 900;
+        }
+    
+        .input-wrapper {
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 10px;
+        }
+      </style>
+  <h1>Mapeador de URL's</h1>
+  <form id="urlForm">
+    <label for="urlInput">URL:</label>
+    <input type="text" id="urlInput" name="url" required>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    document.getElementById('urlForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const url = document.getElementById('urlInput').value;
+    const responseContainer = document.getElementById('responseContainer');
+    responseContainer.textContent = 'Processando...';
+
+    try {
+      const response = await fetch(`/processURLs?url=${encodeURIComponent(url)}`);
+      if (response.ok) {
+        const disposition = response.headers.get('Content-Disposition');
+        const filename = disposition ? disposition.match(/filename=(.+)/)[1] : 'jsonFiles.json';
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        link.click();
+
+        responseContainer.textContent = 'Download concluído.';
+      } else {
+        const errorMessage = await response.text();
+        console.error('Erro ao processar a URL:', errorMessage);
+        responseContainer.textContent = 'Erro ao processar a URL';
+      }
+    } catch (error) {
+      console.error('Ocorreu um erro:', error);
+      responseContainer.textContent = 'Erro ao processar a URL';
+    }
+  });
+  </script>
+  <div id="responseContainer"></div>
+</body>
+</html>
