@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitemap Analyzer</title>
+</head>
+<body>
+    <h1>Sitemap Analyzer</h1>
+    <label for="urlInput">Digite a URL que deseja analisar:</label>
+    <input type="text" id="urlInput" placeholder="https://example.com" />
+    <button id="analyzeButton">Analisar</button>
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('analyzeButton').addEventListener('click', async () => {
+            const url = document.getElementById('urlInput').value;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.innerHTML = 'Analisando...';
+
+            try {
+                const response = await fetch(`/analyze?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                let resultHtml = '';
+                if (data.error) {
+                    resultHtml = `<p>Error: ${data.error}</p>`;
+                } else {
+                    resultHtml = `<p>Arquivo sitemap.json gerado com sucesso!</p>`;
+                }
+
+                resultDiv.innerHTML = resultHtml;
+            } catch (error) {
+                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler</title>
+    <style>
+         #container {
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 50px;
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: flex-start;
+              align-items: stretch;
+              background: #000000c2;
+              align-content: space-around;
+              flex-direction: column;
+}
+        .input-wrapper input[type="file"] {
+      width: 500px;
+    }
+
+    @font-face {
+      font-family: 'Kanit-Bold';
+      src: url('assets/fonts/Kanit-Bold.ttf') format('truetype');
+      /* Outros formatos de arquivo de fonte também podem ser adicionados aqui */
+    }
+
+    body {
+      font-family: 'Kanit-Bold', sans-serif;
+      font-size: 16px;
+      background-image: url('https://a2bi.com.br/photos/A%C2%B2Business-intelligence-home.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      padding-left: 50px;
+    }
+
+    .input-wrapper {
+    font-family: 'Kanit-Bold', sans-serif;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    color: #ffff;
+    }
+
+    form {
+      gap: 10px;
+    }
+
+    label {
+      display: block;
+    }
+
+    input[type="file"] {
+      width: 300px;
+      padding: 0px;
+      font-family: 'Kanit-Bold', sans-serif;
+      font-size: 16px;
+    }
+
+    label{
+        color: #ffff;
+        font-family: 'Kanit-Bold', sans-serif;
+        font-weight: 550;
+        padding-bottom: 20px;
+    }
+
+    input#urlInput {
+        font-size: 18px;
+        font-family: kanit;
+        padding: 7px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: rgb(161 22 22);
+      font-family: roboto;
+      font-size: 16px;
+      color: #ffff;
+      cursor: pointer;
+      border-color: #ffffff00;
+    }
+
+    button:hover {
+      background: rgb(201, 14, 14);
+      transition: ease 0.3s;
+      font-size: 18px;
+    }
+
+    button#downloadButton {
+    display: block;
+    background: #2e3a4b00;
+}
+
+    h1 {
+      font-family: 'Kanit-Bold', sans-serif;
+      color: #ffff;
+      font-size: 70px;
+      font-weight: bold;
+      font-weight: 900;
+    }
+
+    .input-wrapper {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    .next-step {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Web Crawler</h1>
+        <label for="urlInput">Digite a URL que deseja analisar:</label>
+        <input type="text" id="urlInput" placeholder="Digite a URL aqui">
+        <button id="analyzeButton">Analisar</button>
+        <button id="downloadButton" style="display: none;">Baixar Sitemap</button>
+        <div class="next-step">
+            <a href="http://localhost:3334/">
+                <button id="nextButton">Próximo</button>
+            </a>
+        </div>
+        
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const analyzeButton = document.getElementById('analyzeButton');
+            const downloadButton = document.getElementById('downloadButton');
+            const urlInput = document.getElementById('urlInput');
+
+            analyzeButton.addEventListener('click', async () => {
+                const url = urlInput.value;
+
+                const response = await fetch(`/analyze?url=${encodeURIComponent(url)}`);
+                if (response.ok) {
+                    downloadButton.style.display = 'block';
+                }
+            });
+
+            downloadButton.addEventListener('click', () => {
+                window.location.href = '/download';
+            });
+        });
+    </script>
+</body>
+</html>
