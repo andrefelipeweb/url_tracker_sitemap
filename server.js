@@ -6,10 +6,19 @@ const parseString = require('xml2js').parseString;
 const app = express();
 const port = 3000;
 
+let sitemapUrls = []; // Armazenar as URLs do sitemap
+
 app.use(express.static('public'));
 
 app.get('/analyze', async (req, res) => {
     const url = req.query.url;
+
+    // Verifica se a URL está no formato esperado
+    const urlPattern = /^(https?:\/\/)?(www\.)?[a-z0-9\-\.]+\.[a-z]{2,}(\.[a-z]{2,})?$/i;
+    if (!urlPattern.test(url)) {
+        res.json({ error: 'Por favor, digite uma URL válida no formato correto.' });
+        return;
+    }
 
     try {
         const sitemapUrl = await getRobotsTxt(url);
@@ -19,14 +28,13 @@ app.get('/analyze', async (req, res) => {
             return;
         }
 
-        const sitemapUrls = await getSitemapUrls(sitemapUrl);
+        sitemapUrls = await getSitemapUrls(sitemapUrl);
 
         if (sitemapUrls.length === 0) {
             res.json({ error: 'Nenhuma URL encontrada no sitemap.' });
             return;
         }
 
-        fs.writeFileSync('public/sitemap.json', JSON.stringify(sitemapUrls, null, 2));
         res.json({ urls: sitemapUrls });
     } catch (error) {
         res.json({ error: 'Ocorreu um erro ao processar a solicitação.' });
@@ -34,12 +42,18 @@ app.get('/analyze', async (req, res) => {
 });
 
 app.get('/download', (req, res) => {
-    const filePath = __dirname + '/public/sitemap.json';
-    res.download(filePath, 'sitemap.json', err => {
-        if (err) {
-            console.error('Erro ao fazer o download do arquivo:', err);
-        }
-    });
+    if (sitemapUrls.length > 0) {
+        const filePath = __dirname + '/public/sitemap.json';
+        fs.writeFileSync(filePath, JSON.stringify(sitemapUrls, null, 2));
+
+        res.download(filePath, 'sitemap.json', err => {
+            if (err) {
+                console.error('Erro ao fazer o download do arquivo:', err);
+            }
+        });
+    } else {
+        res.send('Nenhum arquivo disponível para download.');
+    }
 });
 
 async function getRobotsTxt(url) {

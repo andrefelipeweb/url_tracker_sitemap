@@ -114,41 +114,67 @@
     margin-top: 30px;
 }
 
+    #loadingMessage{
+      display: none;
+      color: rgb(255, 255, 255);
+      font-family: Kanit-Bold, sans-serif;
+      font-weight: 550;
+      padding-bottom: 20px;
+      padding-top: 20px;
+    }
+
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>Web Crawler</h1>
-        <label for="urlInput">Digite a URL que deseja analisar:</label>
-        <input type="text" id="urlInput" placeholder="Digite a URL aqui">
-        <button id="analyzeButton">Analisar</button>
-        <button id="downloadButton" style="display: none;">Baixar Sitemap</button>
-        <div class="next-step">
-            <a href="http://85.31.235.168:3334/">
-                <button id="nextButton">Próximo</button>
-            </a>
-        </div>
-        
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const analyzeButton = document.getElementById('analyzeButton');
-            const downloadButton = document.getElementById('downloadButton');
-            const urlInput = document.getElementById('urlInput');
+  <div id="container">
+      <h1>Web Crawler</h1>
+      <label for="urlInput">Digite a URL que deseja analisar:</label>
+      <label for="urlInput">A url deverá respeitar o seguinte formato: <p>https://www.nomedosite...</p></label>
+      <input type="text" id="urlInput" placeholder="Digite a URL aqui">
+      <button id="analyzeButton">Analisar</button>
+      <button id="downloadButton" style="display: none;">Baixar Sitemap</button>
+      <div id="loadingMessage" style="display: none;">Carregando...</div>
+      <div id="errorMessage" style="display: none; color: red;">Por favor, digite uma URL válida no formato correto.</div>
+      <div class="next-step">
+          <a href="http://85.31.235.168:3334/">
+              <button id="nextButton">Próximo</button>
+          </a>
+      </div>
+  </div>
+  <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          const analyzeButton = document.getElementById('analyzeButton');
+          const downloadButton = document.getElementById('downloadButton');
+          const loadingMessage = document.getElementById('loadingMessage');
+          const urlInput = document.getElementById('urlInput');
+          const errorMessage = document.getElementById('errorMessage');
 
-            analyzeButton.addEventListener('click', async () => {
-                const url = urlInput.value;
+          analyzeButton.addEventListener('click', async () => {
+              const url = urlInput.value;
 
-                const response = await fetch(`/analyze?url=${encodeURIComponent(url)}`);
-                if (response.ok) {
-                    downloadButton.style.display = 'block';
-                }
-            });
+              // Exibir a mensagem de carregamento
+              loadingMessage.style.display = 'block';
+              errorMessage.style.display = 'none'; // Esconder a mensagem de erro, se estiver visível
 
-            downloadButton.addEventListener('click', () => {
-                window.location.href = '/download';
-            });
-        });
-    </script>
+              // Validar a URL usando uma expressão regular
+              const urlPattern = /^(https?:\/\/)?(www\.)?[a-z0-9\-\.]+\.[a-z]{2,}(\.[a-z]{2,})?$/i;
+              if (!urlPattern.test(url)) {
+                  errorMessage.style.display = 'block'; // Exibir a mensagem de erro
+                  loadingMessage.style.display = 'none'; // Esconder a mensagem de carregamento
+                  return;
+              }
+
+              const response = await fetch(`/analyze?url=${encodeURIComponent(url)}`);
+              if (response.ok) {
+                  loadingMessage.style.display = 'none'; // Esconder a mensagem de carregamento
+                  downloadButton.style.display = 'block';
+              }
+          });
+
+          downloadButton.addEventListener('click', () => {
+              window.location.href = '/download';
+          });
+      });
+  </script>
 </body>
 </html>
