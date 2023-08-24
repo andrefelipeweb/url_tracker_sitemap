@@ -135,6 +135,8 @@
       <button id="downloadButton" style="display: none;">Baixar Sitemap</button>
       <div id="loadingMessage" style="display: none;">Carregando...</div>
       <div id="errorMessage" style="display: none; color: red;">Por favor, digite uma URL válida no formato correto.</div>
+      <div id="noFileMessage" style="display: none; color: red;">Nenhum arquivo disponível para download.</div>
+      <div id="noSitemapMessage" style="display: none; color: red;">Sitemap não existe.</div>
       <div class="next-step">
           <a href="http://85.31.235.168:3334/">
               <button id="nextButton">Próximo</button>
@@ -148,26 +150,43 @@
           const loadingMessage = document.getElementById('loadingMessage');
           const urlInput = document.getElementById('urlInput');
           const errorMessage = document.getElementById('errorMessage');
+          const noFileMessage = document.getElementById('noFileMessage');
+          const noSitemapMessage = document.getElementById('noSitemapMessage');
 
           analyzeButton.addEventListener('click', async () => {
               const url = urlInput.value;
 
               // Exibir a mensagem de carregamento
               loadingMessage.style.display = 'block';
-              errorMessage.style.display = 'none'; // Esconder a mensagem de erro, se estiver visível
+              errorMessage.style.display = 'none';
+              noFileMessage.style.display = 'none';
+              noSitemapMessage.style.display = 'none';
 
-              // Validar a URL usando uma expressão regular
               const urlPattern = /^(https?:\/\/)?(www\.)?[a-z0-9\-\.]+\.[a-z]{2,}(\.[a-z]{2,})?$/i;
               if (!urlPattern.test(url)) {
-                  errorMessage.style.display = 'block'; // Exibir a mensagem de erro
-                  loadingMessage.style.display = 'none'; // Esconder a mensagem de carregamento
+                  errorMessage.style.display = 'block';
+                  loadingMessage.style.display = 'none';
                   return;
               }
 
               const response = await fetch(`/analyze?url=${encodeURIComponent(url)}`);
               if (response.ok) {
-                  loadingMessage.style.display = 'none'; // Esconder a mensagem de carregamento
-                  downloadButton.style.display = 'block';
+                  const responseData = await response.json();
+                  loadingMessage.style.display = 'none';
+
+                  if (responseData.urls && responseData.urls.length > 0) {
+                      downloadButton.style.display = 'block';
+                      noFileMessage.style.display = 'none';
+                      noSitemapMessage.style.display = 'none';
+                  } else {
+                      downloadButton.style.display = 'none';
+                      noFileMessage.style.display = 'block';
+                      noSitemapMessage.style.display = 'none';
+                  }
+              } else {
+                  downloadButton.style.display = 'none';
+                  noFileMessage.style.display = 'none';
+                  noSitemapMessage.style.display = 'block';
               }
           });
 

@@ -21,22 +21,11 @@ app.get('/analyze', async (req, res) => {
     }
 
     try {
-        if (!(await isUrlAccessible(url))) {
-            res.json({ error: 'A URL fornecida não é acessível. Verifique a URL e tente novamente.' });
-            return;
-        }
-
-        let sitemapUrl = await getRobotsTxt(url);
+        const sitemapUrl = await getRobotsTxt(url);
 
         if (!sitemapUrl) {
-            // Se não encontrou o sitemap no robots.txt, tenta diretamente o sitemap.xml
-            sitemapUrl = `${url}/sitemap.xml`;
-            const sitemapExists = await checkSitemapExists(sitemapUrl);
-
-            if (!sitemapExists) {
-                res.json({ error: 'Nenhum sitemap encontrado.' });
-                return;
-            }
+            res.json({ error: 'Nenhum sitemap encontrado no arquivo robots.txt.' });
+            return;
         }
 
         sitemapUrls = await getSitemapUrls(sitemapUrl);
@@ -67,15 +56,6 @@ app.get('/download', (req, res) => {
     }
 });
 
-async function isUrlAccessible(url) {
-    try {
-        const response = await axios.get(url);
-        return response.status === 200;
-    } catch (error) {
-        return false;
-    }
-}
-
 async function getRobotsTxt(url) {
     const response = await axios.get(`${url}/robots.txt`);
     const lines = response.data.split('\n');
@@ -88,15 +68,6 @@ async function getRobotsTxt(url) {
     });
 
     return sitemapUrl;
-}
-
-async function checkSitemapExists(sitemapUrl) {
-    try {
-        const response = await axios.head(sitemapUrl);
-        return response.status === 200;
-    } catch (error) {
-        return false;
-    }
 }
 
 async function getSitemapUrls(sitemapUrl) {
