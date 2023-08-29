@@ -105,7 +105,9 @@ async function getSitemapUrls(sitemapUrl) {
 
     parseString(response.data, (err, result) => {
         if (!err && result.urlset && result.urlset.url) {
-            urls = result.urlset.url.map(url => url.loc[0]);
+            urls = result.urlset.url
+                .map(url => url.loc[0]) // Get the URL string
+                .filter(url => !url.includes('/robots')); // Filter out URLs containing "/robots"
         }
     });
 
